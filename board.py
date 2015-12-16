@@ -92,16 +92,100 @@ class Board(object):
 
         return self.board, earned_free_move
 
+    def _dummy_move_stones(self, player_num, start_index, dummy_board):
+        # dummy_board = self.board[:]
+        if player_num == 1:
+            current_area = P1_PITS
+        else:
+            current_area = P2_PITS
+
+        # Confirm stones are available at the given index.
+        if not dummy_board[current_area][start_index]:
+            raise InvalidMove
+
+        # Pick up the stones from the right pit.
+        stones_grabbed = dummy_board[current_area][start_index]
+        dummy_board[current_area][start_index] = 0
+
+        # Ready a moving index
+        index = start_index
+
+        for stone in range(stones_grabbed):
+            try:
+                # Try to place in adjacent pit prior to incrementing index.
+                dummy_board[current_area][index+1] += 1
+                # Stone successfully placed, so increase index.
+                index += 1
+            except IndexError:
+                # Proceed to next area
+                current_area = self._get_next_area(current_area)
+
+                # Check to ensure opposing store is skipped.
+                if player_num == 1 and current_area == P2_STORE:
+                    current_area = self._get_next_area(current_area)
+                elif player_num == 2 and current_area == P1_STORE:
+                    current_area = self._get_next_area(current_area)
+                else:
+                    pass
+                # Reset index and increment stone at current position
+                index = 0
+                dummy_board[current_area][index] += 1
+
+        if self._earned_free_move(player_num, current_area):
+            earned_free_move = True
+        else:
+            earned_free_move = False
+
+        # If last move earned a capture, process it.
+        if self._dummy_earned_capture(player_num, current_area, index, dummy_board):
+            dummy_board = self._dummy_process_capture(current_area, index, dummy_board)
+
+        return dummy_board, earned_free_move        
+
     def _earned_free_move(self, player_num, last_area):
         """ Checks whether a free move was earned. """
         if player_num == 1 and last_area == P1_STORE:
-            print "Earned free move!"
+            print "Human Earned free move!"
             return True
         elif player_num == 2 and last_area == P2_STORE:
-            print "Earned free move!"
+            print "AI Earned free move!"
             return True
         else:
             return False
+
+
+    def _dummy_earned_capture(self, player_num, last_area, last_index, dummy_board):
+        """ Checks whether the last move earned a capture.
+
+        last_area: integer associated with last board area
+        last_index: integer of the last move's index
+        """
+
+        opposing_area, opposing_index = self._get_opposing_area_and_index(
+            last_area, last_index)
+
+        # Check whether last move was in Player's own pits.
+        if player_num == 1:
+            if not last_area == P1_PITS:
+                return False
+        elif player_num == 2:
+            if not last_area == P2_PITS:
+                return False
+        else:
+            pass
+
+
+        # Check whether last move's pit now has more than 1 stone.
+        if dummy_board[last_area][last_index] > 1:
+            return False
+
+        # Check whether opposite pit has capturable stones.
+        elif dummy_board[opposing_area][opposing_index] == 0:
+            return False
+
+        # Placed stone in own empty pit, adjacent capturable stones.
+        else:
+            return True
 
     def _earned_capture(self, player_num, last_area, last_index):
         """ Checks whether the last move earned a capture.
@@ -134,6 +218,31 @@ class Board(object):
         # Placed stone in own empty pit, adjacent capturable stones.
         else:
             return True
+
+    def _dummy_process_capture(self, last_area, last_index, dummy_board):
+        """ Processes capture by moving stones to the player's store. """
+
+        if last_area == P1_PITS:
+            destination_store = P1_STORE
+        else:
+            destination_store = P2_STORE
+
+        opposing_area, opposing_index = self._get_opposing_area_and_index(
+            last_area, last_index)
+
+        captured_stones = dummy_board[opposing_area][opposing_index]
+        print "%d stones captured!" % captured_stones
+
+        # Clear the two pits
+        dummy_board[last_area][last_index] = 0
+        dummy_board[opposing_area][opposing_index] = 0
+
+        # Move captures and original stone to store
+        total_gain = captured_stones + 1
+        dummy_board[destination_store][0] += total_gain
+
+        return dummy_board
+
 
     def _process_capture(self, last_area, last_index):
         """ Processes capture by moving stones to the player's store. """

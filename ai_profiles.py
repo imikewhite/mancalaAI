@@ -5,6 +5,7 @@ from os import sys
 
 from mancala import Player, reverse_index
 from constants import AI_NAME, P1_PITS, P2_PITS
+from tree import Node
 
 class AIPlayer(Player):
     """ Base class for an AI Player """
@@ -91,6 +92,31 @@ class VectorAI(AIPlayer):
 #Here is a simple minimax AI without pruning, maybe plan to prune with above tree idea
 class MinimaxAI(AIPlayer):
     """AI Profile Uses a Simple minimax algorthim"""
+
+    def flip_number(self):
+        if self.number == 1:
+            self.number = 2
+        else:
+            self.number = 1
+
+    def build_game_tree(self, depth, board, is_max):
+        r = Node(board, is_max)
+
+        if depth == 0 :
+            return r
+        print "r is: "
+        print r.print_tree(0)
+        #Get children of this node, which are the other player's moves
+        #Need to flip number
+        self.flip_number()
+        for move in self.eligible_moves:
+            new_board, free_move = self.board._dummy_move_stones(self.number, move, board)
+            ci = self.build_game_tree(depth-1, new_board, (is_max if free_move else not is_max))
+            r.add_child(ci)
+
+        return r
+
+
     #Checks value of each move and returns the index of the best avaliable move
     def get_next_move(self):
         self._think()
@@ -98,12 +124,9 @@ class MinimaxAI(AIPlayer):
         move_scores = []
         #fill move_scores using minimax
         for move in self.eligible_moves:
-            old_board = self.board.board
-            new_board, free_move_bool = self.board._move_stones(self.number, move)
-            self.board.board = new_board
-            benefit = self.minimax(4,True)
+            new_board, free_move = self.board._dummy_move_stones(self.number, move, self.board.board)
+            benefit = self.minimax(4, free_move, new_board)
             move_scores.append((move,benefit))
-            self.board.board = old_board
         #variable to be replaced by correct choice
         choice = -sys.maxint-1
         #Get choice with the highest score
@@ -114,55 +137,110 @@ class MinimaxAI(AIPlayer):
         return choice
 
 
+
+    def minimax(self, depth, maxPlayer, board):
+
+        print "Input Board: ",
+        print board
+
+        if depth == 0 or self._winner():
+            if self.number == 1:
+                score = board[1][0] - board[3][0]
+            else:
+                score = board[3][0] - board[1][0]
+            return score
+
+        if maxPlayer:
+            best_val = -sys.maxint-1
+            print "Maximizer"
+            print "Eligible Moves: ",
+            print self.eligible_moves
+            for child in self.eligible_moves:
+
+                next_board, free_move = self.board._dummy_move_stones(self.number, child, board)
+
+                print "Next Board: ",
+                print next_board
+                isMax = free_move
+
+                next_move_val = self.minimax(depth -1, isMax, next_board)
+
+                print "Minimax returned with: " + str(next_move_val)
+
+                best_val = max(best_val, next_move_val)
+
+            return best_val
+        else:
+            best_val = sys.maxint
+            print "Minimizer"
+            print "Eligible Moves: ",
+            print self.eligible_moves
+            for child in self.eligible_moves:
+
+                next_board, free_move = self.board._dummy_move_stones(self.number, child, board)
+
+                print "Next Board: ",
+                print next_board
+                isMax = free_move
+
+                next_move_val = self.minimax(depth -1, isMax, next_board)
+
+                print "Minimax returned with: " + str(next_move_val)
+
+                best_val = min(best_val, next_move_val)
+
+            return best_val
+
+
     #returns a score for a certain move....Heuristic based on advantage, not 
     #necessarily fastest path to winning goal
-    def minimax(self, depth, maximizingPlayer):
-        #If we've gone deep enough or if game is over at this points
-        #Might want to return score + a certain number if its a winner to give
-        #such states a higher value and - points if puts other player in winning state
-        if depth == 0 or self._winner():
-            # Return value for this move (difference in pits)
-            if self.number == 1:
-                score = self.board.board[1][0] - self.board.board[3][0]
-            else:
-                score = self.board.board[3][0] - self.board.board[1][0]
-            return score
-        # If we are trying to maximize the score
-        if maximizingPlayer:
-            bestValue = -sys.maxint-1
-            #Go through all moves and get best move
-            for child in self.eligible_moves:
-                old_board = self.board.board
-                new_board, free_move_bool = self.board._move_stones(self.number, child)
-                if free_move_bool:
-                    isMax = True
-                else:
-                    isMax = False
-                #Current players pit scores
-                self.board.board = new_board
-                print 
-                val = self.minimax(depth - 1, isMax)
-                self.board.board = old_board
-                bestValue = max(bestValue, val)
-            #return score of move
-            return bestValue
-        #We are trying to minimize the score
-        else:
-            bestValue = sys.maxint
-            for child in self.eligible_moves:
-                old_board = self.board.board
-                new_board, free_move_bool = self.board._move_stones(self.number, child)
-                if free_move_bool:
-                    isMax = False
-                else:
-                    isMax = True
-                #Current players pit scores
-                self.board.board = new_board
-                val = self.minimax(depth - 1, isMax)
-                self.board.board = old_board
-                bestValue = min(bestValue, val)
-            #return score of move
-            return bestValue
+    # def minimax(self, depth, maximizingPlayer):
+    #     #If we've gone deep enough or if game is over at this points
+    #     #Might want to return score + a certain number if its a winner to give
+    #     #such states a higher value and - points if puts other player in winning state
+    #     if depth == 0 or self._winner():
+    #         # Return value for this move (difference in pits)
+    #         if self.number == 1:
+    #             score = self.board.board[1][0] - self.board.board[3][0]
+    #         else:
+    #             score = self.board.board[3][0] - self.board.board[1][0]
+    #         return score
+    #     # If we are trying to maximize the score
+    #     if maximizingPlayer:
+    #         bestValue = -sys.maxint-1
+    #         #Go through all moves and get best move
+    #         for child in self.eligible_moves:
+    #             old_board = self.board.board
+    #             new_board, free_move_bool = self.board._move_stones(self.number, child)
+    #             if free_move_bool:
+    #                 isMax = True
+    #             else:
+    #                 isMax = False
+    #             #Current players pit scores
+    #             self.board.board = new_board
+    #             print 
+    #             val = self.minimax(depth - 1, isMax)
+    #             self.board.board = old_board
+    #             bestValue = max(bestValue, val)
+    #         #return score of move
+    #         return bestValue
+    #     #We are trying to minimize the score
+    #     else:
+    #         bestValue = sys.maxint
+    #         for child in self.eligible_moves:
+    #             old_board = self.board.board
+    #             new_board, free_move_bool = self.board._move_stones(self.number, child)
+    #             if free_move_bool:
+    #                 isMax = False
+    #             else:
+    #                 isMax = True
+    #             #Current players pit scores
+    #             self.board.board = new_board
+    #             val = self.minimax(depth - 1, isMax)
+    #             self.board.board = old_board
+    #             bestValue = min(bestValue, val)
+    #         #return score of move
+    #         return bestValue
 
     def _winner(self):
         """ Checks for winner"""
