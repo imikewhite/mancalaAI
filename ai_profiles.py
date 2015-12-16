@@ -95,13 +95,15 @@ class MinimaxAI(AIPlayer):
     def get_next_move(self):
         self._think()
         #List of pairs, first entry is index for move, second is its value
-        move_scores =[]
+        move_scores = []
         #fill move_scores using minimax
         for move in self.eligible_moves:
+            old_board = self.board.board
             new_board, free_move_bool = self.board._move_stones(self.number, move)
             self.board.board = new_board
-            benefit = self.minimax(4,True,0)
+            benefit = self.minimax(4,True)
             move_scores.append((move,benefit))
+            self.board.board = old_board
         #variable to be replaced by correct choice
         choice = -sys.maxint-1
         #Get choice with the highest score
@@ -114,30 +116,33 @@ class MinimaxAI(AIPlayer):
 
     #returns a score for a certain move....Heuristic based on advantage, not 
     #necessarily fastest path to winning goal
-    def minimax(self, depth, maximizingPlayer, score):
+    def minimax(self, depth, maximizingPlayer):
         #If we've gone deep enough or if game is over at this points
         #Might want to return score + a certain number if its a winner to give
         #such states a higher value and - points if puts other player in winning state
         if depth == 0 or self._winner():
             # Return value for this move (difference in pits)
+            if self.number == 1:
+                score = self.board.board[1][0] - self.board.board[3][0]
+            else:
+                score = self.board.board[3][0] - self.board.board[1][0]
             return score
         # If we are trying to maximize the score
         if maximizingPlayer:
             bestValue = -sys.maxint-1
             #Go through all moves and get best move
             for child in self.eligible_moves:
+                old_board = self.board.board
                 new_board, free_move_bool = self.board._move_stones(self.number, child)
                 if free_move_bool:
                     isMax = True
                 else:
                     isMax = False
                 #Current players pit scores
-                if self.number == 1:
-                    newest_score = self.board.board[1][0] - self.board.board[3][0]
-                else:
-                    newest_score = self.board.board[3][0] - self.board.board[1][0]
                 self.board.board = new_board
-                val = self.minimax(depth - 1, isMax, newest_score)
+                print 
+                val = self.minimax(depth - 1, isMax)
+                self.board.board = old_board
                 bestValue = max(bestValue, val)
             #return score of move
             return bestValue
@@ -145,19 +150,17 @@ class MinimaxAI(AIPlayer):
         else:
             bestValue = sys.maxint
             for child in self.eligible_moves:
+                old_board = self.board.board
                 new_board, free_move_bool = self.board._move_stones(self.number, child)
                 if free_move_bool:
                     isMax = False
                 else:
                     isMax = True
                 #Current players pit scores
-                if self.number == 1:
-                    newest_score = self.board.board[1][0] - self.board.board[3][0]
-                else:
-                    newest_score = self.board.board[3][0] - self.board.board[1][0]
                 self.board.board = new_board
-                val = self.minimax(depth - 1, isMax, newest_score)
-                bestValue = max(bestValue, val)
+                val = self.minimax(depth - 1, isMax)
+                self.board.board = old_board
+                bestValue = min(bestValue, val)
             #return score of move
             return bestValue
 
