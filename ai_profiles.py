@@ -6,6 +6,7 @@ from os import sys
 from mancala import Player, reverse_index
 from constants import AI_NAME, P1_PITS, P2_PITS
 from tree import Node
+import copy
 
 class AIPlayer(Player):
     """ Base class for an AI Player """
@@ -93,26 +94,40 @@ class VectorAI(AIPlayer):
 class MinimaxAI(AIPlayer):
     """AI Profile Uses a Simple minimax algorthim"""
 
-    def flip_number(self):
-        if self.number == 1:
-            self.number = 2
+    def get_pits_for_board(self, board, number):
+        if number == 1:
+            return board[P1_PITS]
         else:
-            self.number = 1
+            return board[P2_PITS]
 
-    def build_game_tree(self, depth, board, is_max):
-        r = Node(board, is_max)
+    def get_eligible_for_board(self, board, number):
+        eligible_moves = []
+        pits = self.get_pits_for_board(board, number)
+        for i in range(len(pits)):
+            if not (pits[i] == 0):
+                eligible_moves.append(i)
+        return eligible_moves
+
+
+    def flip_number(self, number):
+        if number == 1:
+            return 2
+        else:
+            return 1
+
+    def build_game_tree(self, depth, board, is_max, number):
+        cpy = copy.deepcopy(board)
+        r = Node(cpy, is_max)
 
         if depth == 0 :
             return r
-        print "r is: "
-        print r.print_tree(0)
-        #Get children of this node, which are the other player's moves
-        #Need to flip number
-        self.flip_number()
-        for move in self.eligible_moves:
-            new_board, free_move = self.board._dummy_move_stones(self.number, move, board)
-            ci = self.build_game_tree(depth-1, new_board, (is_max if free_move else not is_max))
-            r.add_child(ci)
+
+        el_moves = self.get_eligible_for_board(cpy, number)
+        for move in el_moves:
+            new_board, free_move = self.board._dummy_move_stones(number, move, cpy)
+            r_num = number if free_move else self.flip_number(number)
+            ci = self.build_game_tree(depth-1, new_board, (is_max if free_move else not is_max), r_num)
+            r.add_child(ci)        
 
         return r
 
