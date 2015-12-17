@@ -5,12 +5,12 @@ if __name__ == '__main__' and __package__ is None:
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 from mancala import Match, HumanPlayer
-from ai_profiles import MinimaxAI
+from ai_profiles import HillSearchAI
 
 def main():
     """ Script to begin a match of Mancala. """
     print "Welcome to Mancala!"
-    match = Match(player1_type=HumanPlayer, player2_type=MinimaxAI)
+    match = Match(player1_type=HumanPlayer, player2_type=HillSearchAI)
     match.handle_next_move()
 
 if __name__ == '__main__':
