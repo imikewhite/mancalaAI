@@ -1,14 +1,18 @@
 class Node(object):
 
-	def __init__(self, value, is_max):
+	def __init__(self, value, is_max, move):
 		self.value = value
 		self.max = is_max
+		self.move = move
 		self.num_children = 0
 		self.children = []
 
 	def add_child(self, c):
 		self.num_children += 1
 		self.children.append(c)
+
+	def set_move(self, m):
+		self.move = m
 
 	def print_value(self, board, sep):
 		return " %s%d  %d  %d  %d  %d  %d\n %s%d                    %d\n  %s%d  %d  %d  %d  %d  %d\n" % (
@@ -27,7 +31,7 @@ class Node(object):
 		for child in self.children:
 			ret += child.print_tree(level+1)
 		return ret
-		# ret = tabs + str(self.max) + "\n"
+		# ret = tabs + str(self.move) + "\n"
 		# for child in self.children:
 		# 	ret += child.print_tree(level+1)
 		# return ret

@@ -49,6 +49,8 @@ class Board(object):
         else:
             current_area = P2_PITS
 
+        print "START_INDEX: " + str(start_index)
+
         # Confirm stones are available at the given index.
         if not self.board[current_area][start_index]:
             raise InvalidMove
@@ -81,7 +83,7 @@ class Board(object):
                 index = 0
                 self.board[current_area][index] += 1
 
-        if self._earned_free_move(player_num, current_area):
+        if self._earned_free_move(player_num, current_area, True):
             earned_free_move = True
         else:
             earned_free_move = False
@@ -101,7 +103,7 @@ class Board(object):
             current_area = P2_PITS
         # Confirm stones are available at the given index.
         if not dummy_board[current_area][start_index]:
-            return [], False
+            return None
 
         # Pick up the stones from the right pit.
         stones_grabbed = dummy_board[current_area][start_index]
@@ -131,7 +133,7 @@ class Board(object):
                 index = 0
                 dummy_board[current_area][index] += 1
 
-        if self._earned_free_move(player_num, current_area):
+        if self._earned_free_move(player_num, current_area, False):
             earned_free_move = True
         else:
             earned_free_move = False
@@ -142,13 +144,15 @@ class Board(object):
 
         return dummy_board, earned_free_move        
 
-    def _earned_free_move(self, player_num, last_area):
+    def _earned_free_move(self, player_num, last_area, p):
         """ Checks whether a free move was earned. """
         if player_num == 1 and last_area == P1_STORE:
-            print "Human Earned free move!"
+            if p:
+                print "Human Earned free move!"
             return True
         elif player_num == 2 and last_area == P2_STORE:
-            print "AI Earned free move!"
+            if p:
+                print "AI Earned free move!"
             return True
         else:
             return False
