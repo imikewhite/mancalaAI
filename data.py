@@ -4,6 +4,7 @@ if __name__ == '__main__' and __package__ is None:
 
 from mancala import Match, HumanPlayer
 from ai_profiles import HillSearchAI, MinimaxAI, RandomAI
+from board import InvalidMove
 import random
 import time
 import os
@@ -11,7 +12,7 @@ import os
 FILENAME = "data.csv"
 
 def write_to_file(line):
-	with open(FILENAME, "a") as f:
+	with open(FILENAME, "a+") as f:
 		f.write(line)
 
 def type_to_string(t):
@@ -45,12 +46,33 @@ def run_games(p1_type, p2_type):
 
 
 if __name__ == '__main__':
-	with open(FILENAME, "w+") as c:
-		c.write("Player1,Player2,Winner,Time,NumTurns\n")
 
-	run_games(MinimaxAI, RandomAI)
-	run_games(MinimaxAI, HillSearchAI)
-	run_games(HillSearchAI, RandomAI)
-	run_games(MinimaxAI, MinimaxAI)
-	run_games(HillSearchAI, HillSearchAI)
-	run_games(RandomAI, RandomAI)
+	print os.path.isfile(FILENAME)
+	
+
+	if not os.path.isfile(FILENAME):
+
+		with open(FILENAME, "w+") as c:
+			c.write("Player1,Player2,Winner,Time,NumTurns\n")
+
+	p1 = sys.argv[1]
+	p2 = sys.argv[2]
+	if p1=="R":
+		p1_type = RandomAI
+	elif p1=="M":
+		p1_type = MinimaxAI
+	elif p1=="H":
+		p1_type = HillSearchAI
+	else:
+		raise InvalidMove
+
+	if p2=="R":
+		p2_type = RandomAI
+	elif p2=="M":
+		p2_type = MinimaxAI
+	elif p2=="H":
+		p2_type = HillSearchAI
+	else:
+		raise InvalidMove
+
+	run_games(p1_type, p2_type)
