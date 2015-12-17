@@ -142,7 +142,7 @@ class MinimaxAI(AIPlayer):
         self._think()
 
         cpy = copy.deepcopy(self.board.board)
-        tree = self.build_game_tree(AI_DEPTH, cpy, True, 2)
+        tree = self.build_game_tree(AI_DEPTH, cpy, True, self.number)
         score, move = self.minimax(tree)
         return move
 

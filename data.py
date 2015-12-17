@@ -49,3 +49,8 @@ if __name__ == '__main__':
 		c.write("Player1,Player2,Winner,Time,NumTurns\n")
 
 	run_games(MinimaxAI, RandomAI)
+	run_games(MinimaxAI, HillSearchAI)
+	run_games(HillSearchAI, RandomAI)
+	run_games(MinimaxAI, MinimaxAI)
+	run_games(HillSearchAI, HillSearchAI)
+	run_games(RandomAI, RandomAI)

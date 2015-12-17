@@ -11,7 +11,7 @@ def main():
     """ Script to begin a match of Mancala. """
     print "Welcome to Mancala!"
     match = Match(player1_type=HumanPlayer, player2_type=HillSearchAI)
-    match.handle_next_move()
+    match.handle_next_move(0)
 
 if __name__ == '__main__':
     main()
