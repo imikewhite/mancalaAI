@@ -148,11 +148,11 @@ class Board(object):
         """ Checks whether a free move was earned. """
         if player_num == 1 and last_area == P1_STORE:
             if p:
-                print "Human Earned free move!"
+                print "P1 Earned free move!"
             return True
         elif player_num == 2 and last_area == P2_STORE:
             if p:
-                print "AI Earned free move!"
+                print "P2 Earned free move!"
             return True
         else:
             return False
