@@ -22,3 +22,5 @@ DEFAULT_AI = 1
 
 
 AI_DEPTH = 6
+
+HILLCLIMB = 1
