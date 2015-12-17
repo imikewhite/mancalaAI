@@ -1,5 +1,5 @@
 """ Module for Mancala Board class. """
-
+import copy
 from constants import P1_PITS, P1_STORE, P2_PITS, P2_STORE
 
 class InvalidBoardArea(Exception):
@@ -92,16 +92,16 @@ class Board(object):
 
         return self.board, earned_free_move
 
-    def _dummy_move_stones(self, player_num, start_index, dummy_board):
+    def _dummy_move_stones(self, player_num, start_index, dummy):
         # dummy_board = self.board[:]
+        dummy_board = copy.deepcopy(dummy)
         if player_num == 1:
             current_area = P1_PITS
         else:
             current_area = P2_PITS
-
         # Confirm stones are available at the given index.
         if not dummy_board[current_area][start_index]:
-            raise InvalidMove
+            return [], False
 
         # Pick up the stones from the right pit.
         stones_grabbed = dummy_board[current_area][start_index]
@@ -231,7 +231,6 @@ class Board(object):
             last_area, last_index)
 
         captured_stones = dummy_board[opposing_area][opposing_index]
-        print "%d stones captured!" % captured_stones
 
         # Clear the two pits
         dummy_board[last_area][last_index] = 0
