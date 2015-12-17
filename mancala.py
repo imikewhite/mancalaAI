@@ -43,23 +43,16 @@ class Match(object):
         except InvalidMove:
             # Check whether game was won by AI.
             if self._check_for_winner():
-                import sys
-                if set(self.board.board[P1_PITS]) == set([0]):
-                    return 1, count
-                else:
-                    return 2, count
-                sys.exit()
+                winner = self._get_winner()
+                return winner, count
             if self.current_turn.__class__ == HumanPlayer:
                 print "Please select a move with stones you can move."
             return self.handle_next_move(count)
 
         # Check whether game was won.
         if self._check_for_winner():
-            import sys
-            if set(self.board.board[P1_PITS]) == set([0]):
-                return 1, count
-            else:
-                return 2, count
+            winner = self._get_winner()
+            return winner, count
 
         # Check whether free move was earned
         if free_move_earned:
@@ -67,6 +60,12 @@ class Match(object):
         else:
             self._swap_current_turn()
             return self.handle_next_move(count+1)
+
+
+    def _get_winner(self):
+        p1_store = self.board.board[P1_STORE]
+        p2_store = self.board.board[P2_STORE]
+        return p1_store, p2_store
 
 
     def _swap_current_turn(self):
