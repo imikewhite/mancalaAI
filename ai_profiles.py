@@ -175,13 +175,10 @@ class MinimaxAI(AIPlayer):
         el_moves = self.get_eligible_for_board(cpy, number)
         for move in el_moves:
             new_board, free_move = self.board._dummy_move_stones(number, move, cpy)
-            if new_board is None:
-                print "Saw a None"
-            else:
-                r_num = number if free_move else self.flip_number(number)
-                ci = self.build_game_tree(depth-1, new_board, (is_max if free_move else not is_max), r_num)
-                ci.set_move(move)
-                r.add_child(ci)       
+            r_num = number if free_move else self.flip_number(number)
+            ci = self.build_game_tree(depth-1, new_board, (is_max if free_move else not is_max), r_num)
+            ci.set_move(move)
+            r.add_child(ci)       
 
         return r
 
@@ -210,10 +207,8 @@ class MinimaxAI(AIPlayer):
         self._think()
 
         cpy = copy.deepcopy(self.board.board)
-        print cpy
         tree = self.build_game_tree(AI_DEPTH, cpy, True, 2)
         score, move = self.minimax(tree)
-        print "MOVE: " + str(move)
         return move
 
 
@@ -238,7 +233,7 @@ class MinimaxAI(AIPlayer):
                 for child in node.children:
                     next, next_move = self.minimax(child)
                     best = next if next >= best else best
-                    best_move = next_move if next >= best else best_move
+                    best_move = child.move if next >= best else best_move
                 return best, best_move
             else:
                 best = sys.maxint
@@ -246,7 +241,7 @@ class MinimaxAI(AIPlayer):
                 for child in node.children:
                     next, next_move = self.minimax(child)
                     best = next if next <= best else best
-                    best_move = next_move if next <= best else best_move
+                    best_move = child.move if next <= best else best_move
                 return best, best_move
 
 

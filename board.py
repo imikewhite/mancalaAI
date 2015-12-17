@@ -49,7 +49,6 @@ class Board(object):
         else:
             current_area = P2_PITS
 
-        print "START_INDEX: " + str(start_index)
 
         # Confirm stones are available at the given index.
         if not self.board[current_area][start_index]:
@@ -103,7 +102,7 @@ class Board(object):
             current_area = P2_PITS
         # Confirm stones are available at the given index.
         if not dummy_board[current_area][start_index]:
-            return None
+            raise InvalidMove
 
         # Pick up the stones from the right pit.
         stones_grabbed = dummy_board[current_area][start_index]
