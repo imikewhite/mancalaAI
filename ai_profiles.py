@@ -179,19 +179,6 @@ class MinimaxAI(AIPlayer):
                     best_move = child.move if next <= best else best_move
                 return best, best_move
 
-    def _winner(self):
-        """ Checks for winner"""
-        # If all the pits are 0 then no more moves and the game is over
-        if set(self.board.board[P2_PITS]) == set([0]):
-            return True
-        #If either player is empty.
-        elif set(self.board.board[P1_PITS]) == set([0]):
-            return True
-        #else game is not over
-        else:
-            return False
-
-
 class HillSearchAI(AIPlayer):
 
     def __init__(self, num, b):
@@ -231,7 +218,8 @@ class HillSearchAI(AIPlayer):
         for move in el_moves:
             new_board, free_move = self.board._dummy_move_stones(number, move, cpy)
             r_num = number if free_move else self.flip_number(number)
-            ci = self.build_game_tree(depth-1, new_board, (is_max if free_move else not is_max), r_num)
+            new_depth = depth - 1 if not free_move else depth
+            ci = self.build_game_tree(new_depth, new_board, (is_max if free_move else not is_max), r_num)
             ci.set_move(move)
             r.add_child(ci)       
 
@@ -252,13 +240,14 @@ class HillSearchAI(AIPlayer):
             score = node.value[3][0] - node.value[1][0]
         else:
             score = node.value[1][0] - node.value[3][0]
-        return score
+        return abs(score)
 
 
     def minimax(self, node):
         if len(node.children) == 0:
             #Leaf, eval board
             score = self.evaluate_board(node)
+            print "Heres the score: " , score
             return score, node.move
         else:
             if node.max:
@@ -277,15 +266,3 @@ class HillSearchAI(AIPlayer):
                     best = next if next <= best else best
                     best_move = child.move if next <= best else best_move
                 return best, best_move
-
-    def _winner(self):
-        """ Checks for winner"""
-        # If all the pits are 0 then no more moves and the game is over
-        if set(self.board.board[P2_PITS]) == set([0]):
-            return True
-        #If either player is empty.
-        elif set(self.board.board[P1_PITS]) == set([0]):
-            return True
-        #else game is not over
-        else:
-            return False
