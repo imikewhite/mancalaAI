@@ -183,25 +183,6 @@ class MinimaxAI(AIPlayer):
         return r
 
 
-    #Checks value of each move and returns the index of the best avaliable move
-    # def get_next_move(self):
-    #     self._think()
-    #     #List of pairs, first entry is index for move, second is its value
-    #     move_scores = []
-    #     #fill move_scores using minimax
-    #     for move in self.eligible_moves:
-    #         new_board, free_move = self.board._dummy_move_stones(self.number, move, self.board.board)
-    #         benefit = self.minimax(4, free_move, new_board)
-    #         move_scores.append((move,benefit))
-    #     #variable to be replaced by correct choice
-    #     choice = -sys.maxint-1
-    #     #Get choice with the highest score
-    #     for choices in move_scores:
-    #         if choices[1] > choice:
-    #             choice = choices[0]
-    #     #make that move
-    #     return choice
-
 
     def get_next_move(self):
         self._think()
@@ -214,10 +195,28 @@ class MinimaxAI(AIPlayer):
 
     def evaluate_board(self, node):
 
+        ai_win = False
+        p_win = False
+
+        if set(node.value[P2_PITS]) == set([0]):
+            ai_win = True
+        #If either player is empty.
+        elif set(node.value[P1_PITS]) == set([0]):
+            p_win =  True
+        #else game is not over
+        else:
+            ai_win = False
+            p_win = False
         if node.max:
             score = node.value[3][0] - node.value[1][0]
         else:
             score = node.value[1][0] - node.value[3][0]
+
+        if ai_win:
+            score = 150
+        elif p_win:
+            score = -150
+
         return score
 
 

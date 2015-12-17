@@ -21,4 +21,4 @@ VECTOR_AI = 1 # optimizes for free turns only considering own side
 DEFAULT_AI = 1
 
 
-AI_DEPTH = 4
+AI_DEPTH = 6
