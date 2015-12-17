@@ -52,7 +52,7 @@ class AIPlayer(Player):
         """ Slight delay for thinking. """
         import time
         print "AI is thinking..."
-        time.sleep(3)
+        time.sleep(0.5)
 
 class RandomAI(AIPlayer):
     """ AI Profile that randomly selects from eligible moves. """
@@ -258,7 +258,7 @@ class HillSearchAI(AIPlayer):
             score = node.value[3][0] - node.value[1][0]
         else:
             score = node.value[1][0] - node.value[3][0]
-            
+
         return abs(score)
 
 
@@ -266,7 +266,6 @@ class HillSearchAI(AIPlayer):
         if len(node.children) == 0:
             #Leaf, eval board
             score = self.evaluate_board(node)
-            print "Heres the score: " , score
             return score, node.move
         else:
             if node.max:

@@ -33,7 +33,7 @@ class Match(object):
         self.player2 = self.players[1]
         self.current_turn = self.player1
 
-    def handle_next_move(self):
+    def handle_next_move(self, count):
         """ Shows board and handles next move. """
         print self.board.textify_board()
 
@@ -44,22 +44,29 @@ class Match(object):
             # Check whether game was won by AI.
             if self._check_for_winner():
                 import sys
+                if set(self.board.board[P1_PITS]) == set([0]):
+                    return 1, count
+                else:
+                    return 2, count
                 sys.exit()
             if self.current_turn.__class__ == HumanPlayer:
                 print "Please select a move with stones you can move."
-            self.handle_next_move()
+            return self.handle_next_move(count)
 
         # Check whether game was won.
         if self._check_for_winner():
             import sys
-            sys.exit()
+            if set(self.board.board[P1_PITS]) == set([0]):
+                return 1, count
+            else:
+                return 2, count
 
         # Check whether free move was earned
         if free_move_earned:
-            self.handle_next_move()
+            return self.handle_next_move(count+1)
         else:
             self._swap_current_turn()
-            self.handle_next_move()
+            return self.handle_next_move(count+1)
 
 
     def _swap_current_turn(self):
