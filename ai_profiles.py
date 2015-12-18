@@ -52,7 +52,7 @@ class AIPlayer(Player):
         """ Slight delay for thinking. """
         import time
         print "AI is thinking..."
-        time.sleep(0.5)
+        time.sleep(2)
 
 class RandomAI(AIPlayer):
     """ AI Profile that randomly selects from eligible moves. """

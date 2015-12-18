@@ -9,7 +9,7 @@ import random
 import time
 import os
 
-FILENAME = "data.csv"
+FILENAME = "data_rm.csv"
 
 def write_to_file(line):
 	with open(FILENAME, "a+") as f:
@@ -33,7 +33,7 @@ def run_game(p1_type, p2_type):
 	return a, b
 
 def run_games(p1_type, p2_type):
-	for i in range(100):
+	for i in range(25):
 		start = time.time()
 
 		scores, moves = run_game(p1_type, p2_type)
@@ -43,9 +43,16 @@ def run_games(p1_type, p2_type):
 		elapsed = time.time() - start
 
 		if p1_score > p2_score:
-			winner = type_to_string(p1_type)
+			if p1_type is RandomAI and p2_type is RandomAI:
+				winner = "Player1"
+			else:
+				winner = type_to_string(p1_type)
 		else:
-			winner = type_to_string(p2_type)
+			if p1_type is RandomAI and p2_type is RandomAI:
+				winner = "Player2"
+			else:
+				winner = type_to_string(p2_type)
+
 
 		score = str(p1_score[0]) + " - " + str(p2_score[0])
 		diff = p1_score[0] - p2_score[0]
