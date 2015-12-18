@@ -43,13 +43,13 @@ def run_games(p1_type, p2_type):
 		elapsed = time.time() - start
 
 		if p1_score > p2_score:
-			winner = "Player1"
+			winner = type_to_string(p1_type)
 		else:
-			winner = "Player2"
+			winner = type_to_string(p2_type)
 
 		score = str(p1_score[0]) + " - " + str(p2_score[0])
-
-		line = type_to_string(p1_type)+ "," + type_to_string(p2_type) +","+ str(winner) + "," + score + "," + str(int(elapsed)) + "," + str(moves) +"\n"
+		diff = p1_score[0] - p2_score[0]
+		line = type_to_string(p1_type)+ "," + type_to_string(p2_type) +","+ str(winner) + "," + score + "," + str(abs(diff)) + "," + str(int(elapsed)) + "," + str(moves) +"\n"
 
 		write_to_file(line)
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 	if not os.path.isfile(FILENAME):
 
 		with open(FILENAME, "w+") as c:
-			c.write("Player1,Player2,Winner,Score,Time,NumTurns\n")
+			c.write("Player1,Player2,Winner,Score,Diff,Time,NumTurns\n")
 
 	p1 = sys.argv[1]
 	p2 = sys.argv[2]
