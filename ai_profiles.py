@@ -4,7 +4,7 @@ from random import choice
 from os import sys
 
 from mancala import Player, reverse_index
-from constants import AI_NAME, P1_PITS, P2_PITS, AI_DEPTH, HILLCLIMB
+from constants import AI_NAME, P1_PITS, P2_PITS, AI_DEPTH_1, AI_DEPTH_2, HILLCLIMB
 from tree import Node
 import copy
 
@@ -97,7 +97,6 @@ class MinimaxAI(AIPlayer):
 
     def __init__(self, num, b):
         super(MinimaxAI, self).__init__(num, b)
-        self.depth = AI_DEPTH
 
 
     def get_pits_for_board(self, board, number):
@@ -142,7 +141,12 @@ class MinimaxAI(AIPlayer):
         self._think()
 
         cpy = copy.deepcopy(self.board.board)
-        tree = self.build_game_tree(AI_DEPTH, cpy, True, self.number)
+        if self.number == 1:
+            #Player 1
+            depth = AI_DEPTH_1
+        else:
+            depth = AI_DEPTH_2
+        tree = self.build_game_tree(depth, cpy, True, self.number)
         score, move = self.minimax(tree)
         return move
 
